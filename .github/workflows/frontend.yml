@@ -35,3 +35,50 @@ jobs:
           tags: |
             jakubn1/zadanie2:v1
           
+
+multistage:
+name: GitHub Action flow to Docker hub v2
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-push-images:
+    name: Budowa i publikacja obrazw na repozytorium
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Buildx set-up
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set qemu
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+
+      - name: Available platforms
+        run: echo ${{ steps.qemu.outputs.platforms }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./dockerfile.v1
+	  platforms: linux/s390x,linux/ppc64le,linux/arm64
+          push: true
+          tags: |
+            jakubn1/zadanie2_cz2:v1
+          
