@@ -33,5 +33,5 @@ jobs:
           file: ./dockerfile.v1
           push: true
           tags: |
-            97JN/zadanie2:v1
+            jakubn1/zadanie2:v1
           
