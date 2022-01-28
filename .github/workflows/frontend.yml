@@ -73,7 +73,7 @@ jobs:
           tags: |
             jakubn1/zadanie2_pkt2:v1
 
-  build with multistage:
+  build_with_multistage:
     name: zadanie 3
     runs-on: ubuntu-latest
 
