@@ -1,4 +1,4 @@
-name: GitHub Action flow to Docker hub 
+name: GitHub Action flow to Docker hub
 
 on:
   push:
@@ -17,52 +17,6 @@ jobs:
       - name: Buildx set-up
         id: buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1 
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./
-          file: ./dockerfile.v1
-          push: true
-          tags: |
-            jakubn1/zadanie2:v1
-          
-
-multistage:
-name: GitHub Action flow to Docker hub v2
-
-on:
-  push:
-    branches: [master]
-
-jobs:
-  build-push-images:
-    name: Budowa i publikacja obrazw na repozytorium
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up QEMU
-          id: qemu
-          uses: docker/setup-qemu-action@v1
-
-      - name: Buildx set-up
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Available platforms
-          run: echo ${{ steps.qemu.outputs.platforms }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -77,8 +31,44 @@ jobs:
         with:
           context: ./
           file: ./dockerfile.v1
-          platforms: linux/amd64,linux/amd64v8,linux/ppc64le
           push: true
           tags: |
             jakubn1/zadanie2:v1
-          
+
+  qemu:
+    name: zadanie 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Buildx set-up
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: Available platforms
+        run: echo ${{ steps.qemu.outputs.platforms }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./dockerfile.v1
+          platforms: linux/amd64,linux/ppc64le,linux/arm/v6
+          push: true
+          tags: |
+            jakubn1/zadanie2_pkt2:v1
